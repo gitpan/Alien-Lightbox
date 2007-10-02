@@ -3,10 +3,7 @@ package MY::Build;
 use strict;
 use warnings;
 use base qw(Module::Build);
-use File::Path qw(mkpath);
 use File::Copy qw(copy);
-use Archive::Zip qw(:ERROR_CODES);
-use Alien::Lightbox;
 
 sub ACTION_code {
     my $self = shift;
@@ -16,12 +13,11 @@ sub ACTION_code {
 }
 
 sub lightbox_archive {
-    return join( '', 'lightbox', Alien::Lightbox->version(), '.zip' );
+    return 'lightbox2.03.3.zip';
 }
 
 sub lightbox_dir {
     return '';
-    return join( '', 'lightbox', Alien::Lightbox->version() );
 }
 
 sub lightbox_target_dir {
@@ -47,14 +43,15 @@ sub install_lightbox {
     my $self = shift;
     return if (-d $self->lightbox_target_dir());
 
+    require Archive::Zip;
     print "Installing lightbox...\n";
     my $zip = Archive::Zip->new();
-    unless ($zip->read($self->lightbox_archive()) == AZ_OK) {
+    unless ($zip->read($self->lightbox_archive()) == Archive::Zip::AZ_OK()) {
         die "unable to open Lightbox zip archive\n";
     }
     my $src = $self->lightbox_dir();
     my $dst = $self->lightbox_target_dir();
-    unless ($zip->extractTree($src,$dst) == AZ_OK) {
+    unless ($zip->extractTree($src,$dst) == Archive::Zip::AZ_OK()) {
         die "unable to extract Lightbox zip archive\n";
     }
 }
